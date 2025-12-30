@@ -8,7 +8,6 @@ variable "resource_group_name" {
 variable "location" {
   description = "Azure region"
   type        = string
-  default     = "canadacentral"
 }
 
 # Default variable
