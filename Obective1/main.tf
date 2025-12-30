@@ -1,26 +1,26 @@
-resource "azurerm_resource_group" "rg" {
-  name     = var.resource_group_name
-  location = var.location
+# Use an existing resource group instead of creating one
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group_name
 }
 
 resource "azurerm_virtual_network" "vnet" {
   name                = "${var.resource_group_name}-vnet"
   address_space       = ["10.0.0.0/16"]
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 }
 
 resource "azurerm_subnet" "subnet" {
   name                 = "default"
-  resource_group_name  = azurerm_resource_group.rg.name
+  resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_network_interface" "nic" {
   name                = "${var.resource_group_name}-nic"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "internal"
@@ -31,8 +31,8 @@ resource "azurerm_network_interface" "nic" {
 
 resource "azurerm_linux_virtual_machine" "vm" {
   name                = "${var.resource_group_name}-vm"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   size                = var.vm_size
   admin_username      = var.admin_username
 
@@ -56,5 +56,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
     version   = "latest"
   }
 }
+
 
 
