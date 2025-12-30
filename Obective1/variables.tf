@@ -23,3 +23,9 @@ variable "admin_username" {
   description = "Admin username for the VM"
   type        = string
 }
+
+variable "admin_password" {
+  description = "Admin password for the VM (demo only)"
+  type        = string
+  sensitive   = true
+}
