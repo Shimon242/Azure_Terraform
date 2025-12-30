@@ -40,12 +40,9 @@ resource "azurerm_linux_virtual_machine" "vm" {
     azurerm_network_interface.nic.id
   ]
 
-  disable_password_authentication = true
-
-  admin_ssh_key {
-    username   = var.admin_username
-    public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJh1V6gR+L4J4z9Zc4vK0Z9h5cG8y3x9m+demo demo@example"
-  }
+  # OPTION 2: Password authentication
+  disable_password_authentication = false
+  admin_password                  = var.admin_password
 
   os_disk {
     caching              = "ReadWrite"
@@ -59,4 +56,5 @@ resource "azurerm_linux_virtual_machine" "vm" {
     version   = "latest"
   }
 }
+
 
