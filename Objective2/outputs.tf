@@ -14,4 +14,3 @@ output "admin_password_used" {
   value     = var.admin_password
   sensitive = true
 }
-dsds
