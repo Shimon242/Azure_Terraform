@@ -3,6 +3,32 @@ resource "azurerm_resource_group" "rg" {
   location = var.location
 }
 
+resource "azurerm_virtual_network" "vnet" {
+  name                = "${var.resource_group_name}-vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+resource "azurerm_subnet" "subnet" {
+  name                 = "default"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_network_interface" "nic" {
+  name                = "${var.resource_group_name}-nic"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
 resource "azurerm_linux_virtual_machine" "vm" {
   name                = "${var.resource_group_name}-vm"
   location            = var.location
@@ -10,14 +36,16 @@ resource "azurerm_linux_virtual_machine" "vm" {
   size                = var.vm_size
   admin_username      = var.admin_username
 
+  network_interface_ids = [
+    azurerm_network_interface.nic.id
+  ]
+
   disable_password_authentication = true
 
   admin_ssh_key {
     username   = var.admin_username
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCexample"
   }
-
-  network_interface_ids = []
 
   os_disk {
     caching              = "ReadWrite"
@@ -31,3 +59,4 @@ resource "azurerm_linux_virtual_machine" "vm" {
     version   = "latest"
   }
 }
+
